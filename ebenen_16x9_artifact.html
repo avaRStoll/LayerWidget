@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informationsebenen – System of Systems</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #1a1a1a; padding: 16px; }
+  .btn-main { font-size: 12px; padding: 5px 14px; border-radius: 7px; border: 1px solid #ccc; background: #f5f5f5; color: #222; cursor: pointer; transition: background 0.2s; }
+  .btn-main:hover { background: #e8e8e8; }
+  .btn-story { font-size: 12px; padding: 5px 16px; border-radius: 7px; border: 1.5px solid #CC2200; background: #fff5f3; color: #CC2200; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+  .btn-story:hover { background: #CC2200; color: #fff; }
+  .btn-story.active { background: #CC2200; color: #fff; }
+  .btn-nav { font-size: 12px; padding: 4px 12px; border-radius: 6px; border: 1px solid #ccc; background: #f5f5f5; color: #222; cursor: pointer; }
+  .btn-nav:disabled { opacity: 0.3; cursor: default; }
+  .layer-g { transition: opacity 0.4s; cursor: pointer; }
+  .cluster-g { cursor: pointer; }
+  .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+  .nav-row { display: none; align-items: center; gap: 6px; }
+  .step-lbl { font-size: 11px; color: #999; }
+  .det-panel { border-radius: 8px; padding: 10px 14px; font-size: 13px; line-height: 1.6; min-height: 52px; border: 1px solid #ddd; background: #f8f8f6; margin-top: 10px; }
+  .legend { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+  .leg-item { font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <div style="display:flex; gap:6px;">
+    <button class="btn-story" id="btn-story" onclick="startStory()">Story-Modus</button>
+    <button class="btn-main" onclick="resetAll()">Zurücksetzen</button>
+  </div>
+  <div class="nav-row" id="nav-controls">
+    <button class="btn-nav" id="btn-prev" onclick="storyPrev()" disabled>← Zurück</button>
+    <span class="step-lbl" id="step-lbl">1 / 6</span>
+    <button class="btn-nav" id="btn-next" onclick="storyNext()">Weiter →</button>
+  </div>
+</div>
+
+<svg id="svg-main" width="100%" viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arru" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M2 2L8 5L2 8" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- EBENE 5 – BAUTEIL (grau) cy=415 -->
+<g id="L5" class="layer-g" onclick="selectLayer(5)">
+  <polygon points="30,415 480,390 930,415 480,440" fill="#DCDCDA" stroke="#888" stroke-width="0.8"/>
+  <text x="60" y="406" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#444">5 · Bauteil</text>
+  <g class="cluster-g" id="c5-anf" onclick="selectCluster(event,5,'Anforderungen','Werkstoffanforderungen, Toleranzen, Normen (ISO, ASTM)')">
+    <ellipse cx="160" cy="415" rx="52" ry="14" fill="#AEAEAA" stroke="#666" stroke-width="0.7"/>
+    <text x="160" y="412" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#222" text-anchor="middle">Anforderungen</text>
+    <circle cx="142" cy="418" r="2.5" fill="#555"/><circle cx="155" cy="421" r="2" fill="#555"/><circle cx="168" cy="420" r="2.5" fill="#555"/><circle cx="178" cy="417" r="1.8" fill="#555"/>
+  </g>
+  <g class="cluster-g" id="c5-spez" onclick="selectCluster(event,5,'Spezifikation','Maßzeichnungen, Materialdatenblätter, Fertigungsspec.')">
+    <ellipse cx="290" cy="402" rx="50" ry="13" fill="#AEAEAA" stroke="#666" stroke-width="0.7"/>
+    <text x="290" y="399" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#222" text-anchor="middle">Spezifikation</text>
+    <circle cx="274" cy="404" r="2.5" fill="#555"/><circle cx="289" cy="407" r="2" fill="#555"/><circle cx="304" cy="406" r="2.5" fill="#555"/>
+  </g>
+  <g class="cluster-g" id="c5-ver" onclick="selectCluster(event,5,'Verifikation','Prüfberichte, Messprotokolle, Lieferantenaudits')">
+    <ellipse cx="415" cy="393" rx="48" ry="12" fill="#AEAEAA" stroke="#666" stroke-width="0.7"/>
+    <text x="415" y="390" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#222" text-anchor="middle">Verifikation</text>
+    <circle cx="400" cy="395" r="2.5" fill="#555"/><circle cx="414" cy="398" r="2" fill="#555"/><circle cx="428" cy="397" r="2.5" fill="#555"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,5,'Validierung','Nicht anwendbar auf Bauteilebene')">
+    <ellipse cx="535" cy="387" rx="46" ry="12" fill="#E4E4E0" stroke="#bbb" stroke-width="0.6" stroke-dasharray="3 2"/>
+    <text x="535" y="384" font-family="system-ui,sans-serif" font-size="8" fill="#bbb" text-anchor="middle">Validierung</text>
+    <circle cx="521" cy="389" r="1.8" fill="#ccc"/><circle cx="535" cy="392" r="1.8" fill="#ccc"/><circle cx="549" cy="391" r="1.8" fill="#ccc"/>
+  </g>
+  <g class="cluster-g" id="c5-rm" onclick="selectCluster(event,5,'Risk Management','Fehlerarten, Ausfallwahrscheinlichkeiten – Basis für FMEA')">
+    <ellipse cx="655" cy="393" rx="52" ry="12" fill="#AEAEAA" stroke="#666" stroke-width="0.7"/>
+    <text x="655" y="390" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#222" text-anchor="middle">Risk Management</text>
+    <circle cx="637" cy="395" r="2.5" fill="#555"/><circle cx="653" cy="398" r="2" fill="#555"/><circle cx="668" cy="397" r="2.5" fill="#555"/><circle cx="678" cy="394" r="1.8" fill="#555"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,5,'Gebrauchstauglichkeit','Nicht anwendbar auf Bauteilebene')">
+    <ellipse cx="778" cy="402" rx="54" ry="13" fill="#E4E4E0" stroke="#bbb" stroke-width="0.6" stroke-dasharray="3 2"/>
+    <text x="778" y="399" font-family="system-ui,sans-serif" font-size="8" fill="#bbb" text-anchor="middle">Gebrauchstauglichkeit</text>
+    <circle cx="762" cy="404" r="1.8" fill="#ccc"/><circle cx="778" cy="407" r="1.8" fill="#ccc"/><circle cx="794" cy="406" r="1.8" fill="#ccc"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,5,'Klinische Bewertung','Biokompatibilität, Materialverträglichkeit (ISO 10993)')">
+    <ellipse cx="888" cy="415" rx="46" ry="14" fill="#AEAEAA" stroke="#666" stroke-width="0.7"/>
+    <text x="888" y="412" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#222" text-anchor="middle">Klin. Bewertung</text>
+    <circle cx="873" cy="417" r="2.5" fill="#555"/><circle cx="887" cy="420" r="2" fill="#555"/><circle cx="901" cy="419" r="2.5" fill="#555"/>
+  </g>
+</g>
+
+<!-- EBENE 4 – KOMPONENTE (blau) cy=327 -->
+<g id="L4" class="layer-g" onclick="selectLayer(4)">
+  <polygon points="30,327 480,302 930,327 480,352" fill="#C8DFF4" stroke="#2266AA" stroke-width="0.8"/>
+  <text x="60" y="318" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#0a3060">4 · Komponente</text>
+  <g class="cluster-g" id="c4-anf" onclick="selectCluster(event,4,'Anforderungen','Funktionale Anforderungen, Schnittstellenanforderungen, SW-Anforderungen')">
+    <ellipse cx="160" cy="327" rx="52" ry="14" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
+    <text x="160" y="324" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Anforderungen</text>
+    <circle cx="142" cy="330" r="2.5" fill="#1a4a80"/><circle cx="155" cy="333" r="2" fill="#1a4a80"/><circle cx="168" cy="332" r="2.5" fill="#1a4a80"/><circle cx="178" cy="329" r="1.8" fill="#1a4a80"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,4,'Spezifikation','Funktionsbeschreibung, Softwarearchitektur, ICD')">
+    <ellipse cx="290" cy="314" rx="50" ry="13" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
+    <text x="290" y="311" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Spezifikation</text>
+    <circle cx="274" cy="316" r="2.5" fill="#1a4a80"/><circle cx="289" cy="319" r="2" fill="#1a4a80"/><circle cx="304" cy="318" r="2.5" fill="#1a4a80"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,4,'Verifikation','Integrationstests, Softwaretests, Bench-Tests')">
+    <ellipse cx="415" cy="305" rx="48" ry="12" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
+    <text x="415" y="302" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Verifikation</text>
+    <circle cx="400" cy="307" r="2.5" fill="#1a4a80"/><circle cx="414" cy="310" r="2" fill="#1a4a80"/><circle cx="428" cy="309" r="2.5" fill="#1a4a80"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,4,'Validierung','Komponentenvalidierung, Simulationen')">
+    <ellipse cx="535" cy="299" rx="46" ry="12" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
+    <text x="535" y="296" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Validierung</text>
+    <circle cx="521" cy="301" r="2.5" fill="#1a4a80"/><circle cx="535" cy="304" r="2" fill="#1a4a80"/><circle cx="549" cy="303" r="2.5" fill="#1a4a80"/>
+  </g>
+  <g class="cluster-g" id="c4-rm" onclick="selectCluster(event,4,'Risk Management','FMEA, Fehlerbaumanalyse, Risikoakzeptanz je Komponente')">
+    <ellipse cx="655" cy="305" rx="52" ry="12" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
+    <text x="655" y="302" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Risk Management</text>
+    <circle cx="637" cy="307" r="2.5" fill="#1a4a80"/><circle cx="653" cy="310" r="2" fill="#1a4a80"/><circle cx="668" cy="309" r="2.5" fill="#1a4a80"/><circle cx="678" cy="306" r="1.8" fill="#1a4a80"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,4,'Gebrauchstauglichkeit','HF-Engineering, Benutzerschnittstellen-Anforderungen')">
+    <ellipse cx="778" cy="314" rx="54" ry="13" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
+    <text x="778" y="311" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Gebrauchstauglichkeit</text>
+    <circle cx="762" cy="316" r="2.5" fill="#1a4a80"/><circle cx="778" cy="319" r="2" fill="#1a4a80"/><circle cx="794" cy="318" r="2.5" fill="#1a4a80"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,4,'Klinische Bewertung','Komponentenleistung, Äquivalenznachweise, Literatur')">
+    <ellipse cx="888" cy="327" rx="46" ry="14" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
+    <text x="888" y="324" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Klin. Bewertung</text>
+    <circle cx="873" cy="329" r="2.5" fill="#1a4a80"/><circle cx="887" cy="332" r="2" fill="#1a4a80"/><circle cx="901" cy="331" r="2.5" fill="#1a4a80"/>
+  </g>
+</g>
+
+<!-- EBENE 3 – PRODUKT (grün) cy=239 -->
+<g id="L3" class="layer-g" onclick="selectLayer(3)">
+  <polygon points="30,239 480,214 930,239 480,264" fill="#BCDEBA" stroke="#2A7A2A" stroke-width="0.8"/>
+  <text x="60" y="230" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#1a4a1a">3 · Produkt</text>
+  <g class="cluster-g" onclick="selectCluster(event,3,'Anforderungen','Produktanforderungen, regulatorische Anforderungen')">
+    <ellipse cx="160" cy="239" rx="52" ry="14" fill="#70AA70" stroke="#2A7A2A" stroke-width="0.7"/>
+    <text x="160" y="236" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a200a" text-anchor="middle">Anforderungen</text>
+    <circle cx="142" cy="242" r="2.5" fill="#1a4a1a"/><circle cx="155" cy="245" r="2" fill="#1a4a1a"/><circle cx="168" cy="244" r="2.5" fill="#1a4a1a"/><circle cx="178" cy="241" r="1.8" fill="#1a4a1a"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,3,'Spezifikation','Produktspezifikation, Design-Output, technische Beschreibung')">
+    <ellipse cx="290" cy="226" rx="50" ry="13" fill="#70AA70" stroke="#2A7A2A" stroke-width="0.7"/>
+    <text x="290" y="223" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a200a" text-anchor="middle">Spezifikation</text>
+    <circle cx="274" cy="228" r="2.5" fill="#1a4a1a"/><circle cx="289" cy="231" r="2" fill="#1a4a1a"/><circle cx="304" cy="230" r="2.5" fill="#1a4a1a"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,3,'Verifikation','Design-Verifikation, Tests gegen Produktspezifikation')">
+    <ellipse cx="415" cy="217" rx="48" ry="12" fill="#70AA70" stroke="#2A7A2A" stroke-width="0.7"/>
+    <text x="415" y="214" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a200a" text-anchor="middle">Verifikation</text>
+    <circle cx="400" cy="219" r="2.5" fill="#1a4a1a"/><circle cx="414" cy="222" r="2" fill="#1a4a1a"/><circle cx="428" cy="221" r="2.5" fill="#1a4a1a"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,3,'Validierung','Design-Validierung, Usability-Tests, klinische Evaluation')">
+    <ellipse cx="535" cy="211" rx="46" ry="12" fill="#70AA70" stroke="#2A7A2A" stroke-width="0.7"/>
+    <text x="535" y="208" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a200a" text-anchor="middle">Validierung</text>
+    <circle cx="521" cy="213" r="2.5" fill="#1a4a1a"/><circle cx="535" cy="216" r="2" fill="#1a4a1a"/><circle cx="549" cy="215" r="2.5" fill="#1a4a1a"/>
+  </g>
+  <g class="cluster-g" id="c3-rm" onclick="selectCluster(event,3,'Risk Management','Produktrisiken, referenziert FMEA aus Ebene 4')">
+    <ellipse cx="655" cy="217" rx="52" ry="12" fill="#70AA70" stroke="#2A7A2A" stroke-width="0.7"/>
+    <text x="655" y="214" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a200a" text-anchor="middle">Risk Management</text>
+    <circle cx="637" cy="219" r="2.5" fill="#1a4a1a"/><circle cx="653" cy="222" r="2" fill="#1a4a1a"/><circle cx="668" cy="221" r="2.5" fill="#1a4a1a"/><circle cx="678" cy="218" r="1.8" fill="#1a4a1a"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,3,'Gebrauchstauglichkeit','IFU, Indikationen, Warnhinweise, summative Evaluation')">
+    <ellipse cx="778" cy="226" rx="54" ry="13" fill="#70AA70" stroke="#2A7A2A" stroke-width="0.7"/>
+    <text x="778" y="223" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a200a" text-anchor="middle">Gebrauchstauglichkeit</text>
+    <circle cx="762" cy="228" r="2.5" fill="#1a4a1a"/><circle cx="778" cy="231" r="2" fill="#1a4a1a"/><circle cx="794" cy="230" r="2.5" fill="#1a4a1a"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,3,'Klinische Bewertung','Klinische Leistung, Äquivalenznachweis, PMCF-Plan')">
+    <ellipse cx="888" cy="239" rx="46" ry="14" fill="#70AA70" stroke="#2A7A2A" stroke-width="0.7"/>
+    <text x="888" y="236" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a200a" text-anchor="middle">Klin. Bewertung</text>
+    <circle cx="873" cy="241" r="2.5" fill="#1a4a1a"/><circle cx="887" cy="244" r="2" fill="#1a4a1a"/><circle cx="901" cy="243" r="2.5" fill="#1a4a1a"/>
+  </g>
+</g>
+
+<!-- EBENE 2 – SYSTEM (gelb) cy=151 -->
+<g id="L2" class="layer-g" onclick="selectLayer(2)">
+  <polygon points="30,151 480,126 930,151 480,176" fill="#F5E87A" stroke="#B8960A" stroke-width="0.8"/>
+  <text x="60" y="142" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#5a4400">2 · System</text>
+  <g class="cluster-g" onclick="selectCluster(event,2,'Anforderungen','Systemanforderungen, Schnittstellendefinitionen')">
+    <ellipse cx="160" cy="151" rx="52" ry="14" fill="#CCAA20" stroke="#B8960A" stroke-width="0.7"/>
+    <text x="160" y="148" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a2a00" text-anchor="middle">Anforderungen</text>
+    <circle cx="142" cy="154" r="2.5" fill="#6a4a00"/><circle cx="155" cy="157" r="2" fill="#6a4a00"/><circle cx="168" cy="156" r="2.5" fill="#6a4a00"/><circle cx="178" cy="153" r="1.8" fill="#6a4a00"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,2,'Spezifikation','Systemarchitektur, Schnittstellenspezifikation ICD')">
+    <ellipse cx="290" cy="138" rx="50" ry="13" fill="#CCAA20" stroke="#B8960A" stroke-width="0.7"/>
+    <text x="290" y="135" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a2a00" text-anchor="middle">Spezifikation</text>
+    <circle cx="274" cy="140" r="2.5" fill="#6a4a00"/><circle cx="289" cy="143" r="2" fill="#6a4a00"/><circle cx="304" cy="142" r="2.5" fill="#6a4a00"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,2,'Verifikation','Systemintegrationstests, Schnittstellentests')">
+    <ellipse cx="415" cy="129" rx="48" ry="12" fill="#CCAA20" stroke="#B8960A" stroke-width="0.7"/>
+    <text x="415" y="126" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a2a00" text-anchor="middle">Verifikation</text>
+    <circle cx="400" cy="131" r="2.5" fill="#6a4a00"/><circle cx="414" cy="134" r="2" fill="#6a4a00"/><circle cx="428" cy="133" r="2.5" fill="#6a4a00"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,2,'Validierung','Systemvalidierung, End-to-End-Tests')">
+    <ellipse cx="535" cy="123" rx="46" ry="12" fill="#CCAA20" stroke="#B8960A" stroke-width="0.7"/>
+    <text x="535" y="120" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a2a00" text-anchor="middle">Validierung</text>
+    <circle cx="521" cy="125" r="2.5" fill="#6a4a00"/><circle cx="535" cy="128" r="2" fill="#6a4a00"/><circle cx="549" cy="127" r="2.5" fill="#6a4a00"/>
+  </g>
+  <g class="cluster-g" id="c2-rm" onclick="selectCluster(event,2,'Risk Management','Systemrisiken, aggregiert aus Ebene 3 & 4')">
+    <ellipse cx="655" cy="129" rx="52" ry="12" fill="#CCAA20" stroke="#B8960A" stroke-width="0.7"/>
+    <text x="655" y="126" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a2a00" text-anchor="middle">Risk Management</text>
+    <circle cx="637" cy="131" r="2.5" fill="#6a4a00"/><circle cx="653" cy="134" r="2" fill="#6a4a00"/><circle cx="668" cy="133" r="2.5" fill="#6a4a00"/><circle cx="678" cy="130" r="1.8" fill="#6a4a00"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,2,'Gebrauchstauglichkeit','System-Usability, Human Factors auf Systemebene')">
+    <ellipse cx="778" cy="138" rx="54" ry="13" fill="#CCAA20" stroke="#B8960A" stroke-width="0.7"/>
+    <text x="778" y="135" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a2a00" text-anchor="middle">Gebrauchstauglichkeit</text>
+    <circle cx="762" cy="140" r="2.5" fill="#6a4a00"/><circle cx="778" cy="143" r="2" fill="#6a4a00"/><circle cx="794" cy="142" r="2.5" fill="#6a4a00"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,2,'Klinische Bewertung','Systemweite klinische Leistung, Safety-Daten')">
+    <ellipse cx="888" cy="151" rx="46" ry="14" fill="#CCAA20" stroke="#B8960A" stroke-width="0.7"/>
+    <text x="888" y="148" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a2a00" text-anchor="middle">Klin. Bewertung</text>
+    <circle cx="873" cy="153" r="2.5" fill="#6a4a00"/><circle cx="887" cy="156" r="2" fill="#6a4a00"/><circle cx="901" cy="155" r="2.5" fill="#6a4a00"/>
+  </g>
+</g>
+
+<!-- EBENE 1 – KLINISCHER WORKFLOW (rot) cy=63 -->
+<g id="L1" class="layer-g" onclick="selectLayer(1)">
+  <polygon points="30,63 480,38 930,63 480,88" fill="#F4A090" stroke="#CC2200" stroke-width="0.8"/>
+  <text x="60" y="54" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#7a1100">1 · Klinischer Workflow</text>
+  <g class="cluster-g" onclick="selectCluster(event,1,'Anforderungen','Klinische Anforderungen, Intended Use, Indikationen')">
+    <ellipse cx="160" cy="63" rx="52" ry="14" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
+    <text x="160" y="60" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Anforderungen</text>
+    <circle cx="142" cy="66" r="2.5" fill="#7a1100"/><circle cx="155" cy="69" r="2" fill="#7a1100"/><circle cx="168" cy="68" r="2.5" fill="#7a1100"/><circle cx="178" cy="65" r="1.8" fill="#7a1100"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,1,'Spezifikation','Klinische Verfahrensbeschreibung, Workflow-Spezifikation')">
+    <ellipse cx="290" cy="50" rx="50" ry="13" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
+    <text x="290" y="47" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Spezifikation</text>
+    <circle cx="274" cy="52" r="2.5" fill="#7a1100"/><circle cx="289" cy="55" r="2" fill="#7a1100"/><circle cx="304" cy="54" r="2.5" fill="#7a1100"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,1,'Verifikation','Prozessverifikation, klinische Workflow-Verifikation')">
+    <ellipse cx="415" cy="41" rx="48" ry="12" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
+    <text x="415" y="38" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Verifikation</text>
+    <circle cx="400" cy="43" r="2.5" fill="#7a1100"/><circle cx="414" cy="46" r="2" fill="#7a1100"/><circle cx="428" cy="45" r="2.5" fill="#7a1100"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,1,'Validierung','Klinische Studien, PMCF, Real-World-Evidence')">
+    <ellipse cx="535" cy="35" rx="46" ry="12" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
+    <text x="535" y="32" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Validierung</text>
+    <circle cx="521" cy="37" r="2.5" fill="#7a1100"/><circle cx="535" cy="40" r="2" fill="#7a1100"/><circle cx="549" cy="39" r="2.5" fill="#7a1100"/>
+  </g>
+  <g class="cluster-g" id="c1-rm" onclick="selectCluster(event,1,'Risk Management','Benefit-Risk-Analyse, Patientenrisiken, Restrisikobewertung')">
+    <ellipse cx="655" cy="41" rx="52" ry="12" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
+    <text x="655" y="38" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Risk Management</text>
+    <circle cx="637" cy="43" r="2.5" fill="#7a1100"/><circle cx="653" cy="46" r="2" fill="#7a1100"/><circle cx="668" cy="45" r="2.5" fill="#7a1100"/><circle cx="678" cy="42" r="1.8" fill="#7a1100"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,1,'Gebrauchstauglichkeit','Summative Evaluation, klinische Gebrauchstauglichkeitsstudie')">
+    <ellipse cx="778" cy="50" rx="54" ry="13" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
+    <text x="778" y="47" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Gebrauchstauglichkeit</text>
+    <circle cx="762" cy="52" r="2.5" fill="#7a1100"/><circle cx="778" cy="55" r="2" fill="#7a1100"/><circle cx="794" cy="54" r="2.5" fill="#7a1100"/>
+  </g>
+  <g class="cluster-g" onclick="selectCluster(event,1,'Klinische Bewertung','Klinische Bewertung MDR Annex XIV, PMCF-Bericht')">
+    <ellipse cx="888" cy="63" rx="46" ry="14" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
+    <text x="888" y="60" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Klin. Bewertung</text>
+    <circle cx="873" cy="65" r="2.5" fill="#7a1100"/><circle cx="887" cy="68" r="2" fill="#7a1100"/><circle cx="901" cy="67" r="2.5" fill="#7a1100"/>
+  </g>
+</g>
+
+<!-- STORY OVERLAY -->
+<ellipse id="story-origin" cx="655" cy="393" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2.5" opacity="0" stroke-dasharray="6 3"/>
+<ellipse id="hl-L4" cx="655" cy="305" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
+<ellipse id="hl-L3" cx="655" cy="217" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
+<ellipse id="hl-L2" cx="655" cy="129" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
+<ellipse id="hl-L1" cx="655" cy="41" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
+<line id="line-54" x1="655" y1="377" x2="655" y2="321" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
+<line id="line-43" x1="655" y1="289" x2="655" y2="233" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
+<line id="line-32" x1="655" y1="201" x2="655" y2="145" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
+<line id="line-21" x1="655" y1="113" x2="655" y2="57" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
+<g id="badge-L4" opacity="0"><ellipse cx="750" cy="289" rx="38" ry="12" fill="#FF6600"/><text x="750" y="293" font-family="system-ui,sans-serif" font-size="9" font-weight="600" fill="#fff" text-anchor="middle">+ FMEA</text></g>
+<g id="badge-L3" opacity="0"><ellipse cx="750" cy="201" rx="50" ry="12" fill="#FF6600"/><text x="750" y="205" font-family="system-ui,sans-serif" font-size="9" font-weight="600" fill="#fff" text-anchor="middle">+ Produktrisiko</text></g>
+<g id="badge-L2" opacity="0"><ellipse cx="750" cy="113" rx="50" ry="12" fill="#FF6600"/><text x="750" y="117" font-family="system-ui,sans-serif" font-size="9" font-weight="600" fill="#fff" text-anchor="middle">+ Systemrisiko</text></g>
+<g id="badge-L1" opacity="0"><ellipse cx="750" cy="25" rx="54" ry="12" fill="#CC2200"/><text x="750" y="29" font-family="system-ui,sans-serif" font-size="9" font-weight="600" fill="#fff" text-anchor="middle">+ Benefit-Risk</text></g>
+</svg>
+
+<div id="det" class="det-panel">
+  <em style="color:#aaa;">Klicke auf eine Ebene oder einen Cluster – oder starte den Story-Modus.</em>
+</div>
+
+<div class="legend">
+  <span class="leg-item"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#FF6600" stroke-width="1.5" stroke-dasharray="4 2"/></svg>Story-Pfad</span>
+  <span class="leg-item"><svg width="10" height="10"><ellipse cx="5" cy="5" rx="4" ry="4" fill="#FF6600"/></svg>Neue Information</span>
+  <span class="leg-item"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#bbb" stroke-width="0.8" stroke-dasharray="3 2"/></svg>Nicht anwendbar</span>
+</div>
+
+<script>
+var sm=false,ss=0,tot=6;
+var ov=['story-origin','hl-L4','hl-L3','hl-L2','hl-L1','line-54','line-43','line-32','line-21','badge-L4','badge-L3','badge-L2','badge-L1'];
+var steps=[
+  {t:'Schritt 1: Information entsteht auf Ebene 5 – Bauteil',
+   d:'Im Risk-Management-Cluster der Bauteilebene entsteht eine konkrete Information: <strong>"Bildverarbeitungschip – Ausfallrate 0.003%"</strong>. Sie existiert genau hier – nicht kopiert, sondern referenzierbar.',
+   s:['story-origin'],l:{1:0.15,2:0.15,3:0.15,4:0.15,5:1}},
+  {t:'Schritt 2: Ebene 4 (Komponente) referenziert und erweitert',
+   d:'Die Ausfallrate wird im Komponenten-RM referenziert. Daraus entsteht eine <strong>neue</strong> Information: FMEA-Zeile "Bildverarbeitungsfehler → mögliche Fehlnavigation". Nicht kopiert – aufgebaut.',
+   s:['line-54','hl-L4','badge-L4'],l:{1:0.15,2:0.15,3:0.15,4:1,5:0.4}},
+  {t:'Schritt 3: Ebene 3 (Produkt) bewertet das Produktrisiko',
+   d:'Das Produkt-RM referenziert die FMEA aus Ebene 4. Neues Objekt: <strong>"Produktrisiko R-042: Fehlnavigation – Schweregrad 3"</strong>. Das Produkt bewertet das Risiko in seinem Kontext.',
+   s:['line-43','hl-L3','badge-L3'],l:{1:0.15,2:0.15,3:1,4:0.4,5:0.15}},
+  {t:'Schritt 4: Ebene 2 (System) aggregiert Risiken',
+   d:'System-RM greift auf alle Produktrisiken zu. Es entsteht: <strong>"Systemrisiko Navigation – übergreifend CT + Roboter + Navigation"</strong>. Neue Information durch Kontext und Kombination.',
+   s:['line-32','hl-L2','badge-L2'],l:{1:0.15,2:1,3:0.4,4:0.15,5:0.15}},
+  {t:'Schritt 5: Ebene 1 – Benefit-Risk-Analyse',
+   d:'Die klinische Ebene referenziert das Systemrisiko und erstellt: <strong>"Nutzen überwiegt Restrisiko – Zulassung empfohlen"</strong>. Klinische Bewertung – gegründet auf allem darunter.',
+   s:['line-21','hl-L1','badge-L1'],l:{1:1,2:0.4,3:0.15,4:0.15,5:0.15}},
+  {t:'Fazit: Eine Quelle – viele Verwendungen',
+   d:'Die Ausfallrate (Ebene 5) wurde <strong>nie kopiert</strong>. Sie wurde referenziert, bewertet und erweitert. Jede Ebene erzeugte eigene Information – aufbauend auf der darunter. Ändert sich die Quelle, ändert sich der gesamte Pfad.',
+   s:[],l:{1:1,2:1,3:1,4:1,5:1}}
+];
+function sh(id){var e=document.getElementById(id);if(e)e.setAttribute('opacity','1');}
+function hi(id){var e=document.getElementById(id);if(e)e.setAttribute('opacity','0');}
+function setL(l){for(var i=1;i<=5;i++){var e=document.getElementById('L'+i);if(e)e.style.opacity=l[i]!==undefined?l[i]:1;}}
+function render(s){
+  var st=steps[s];
+  document.getElementById('step-lbl').textContent=(s+1)+' / '+tot;
+  document.getElementById('btn-prev').disabled=s===0;
+  document.getElementById('btn-next').disabled=s===tot-1;
+  document.getElementById('btn-next').textContent=s===tot-2?'Fazit →':s===tot-1?'–':'Weiter →';
+  setL(st.l); st.s.forEach(sh);
+  document.getElementById('det').innerHTML='<strong>'+st.t+'</strong><br><span style="color:#555;">'+st.d+'</span>';
+}
+function startStory(){
+  sm=true;ss=0;
+  document.getElementById('nav-controls').style.display='flex';
+  document.getElementById('btn-story').classList.add('active');
+  ov.forEach(hi); render(0);
+}
+function storyNext(){if(ss<tot-1){ss++;render(ss);}}
+function storyPrev(){if(ss>0){steps[ss].s.forEach(hi);ss--;render(ss);}}
+var lN={1:'Klinischer Workflow',2:'System',3:'Produkt',4:'Komponente',5:'Bauteil'};
+var lC={1:'#7a1100',2:'#5a4400',3:'#1a4a1a',4:'#0a2040',5:'#333'};
+function selectLayer(n){
+  if(sm)return;
+  document.getElementById('det').innerHTML='<strong style="color:'+lC[n]+';">Ebene '+n+': '+lN[n]+'</strong><br><span style="color:#555;">Klicke auf einen Daten-Cluster für Details.</span>';
+  for(var i=1;i<=5;i++){var e=document.getElementById('L'+i);if(e)e.style.opacity=(i===n)?'1':'0.2';}
+}
+function selectCluster(evt,layer,cluster,desc){
+  if(sm)return; evt.stopPropagation();
+  var inactive=desc.indexOf('Nicht anwendbar')===0;
+  document.getElementById('det').innerHTML=
+    '<strong style="color:'+lC[layer]+';">'+cluster+'</strong> <span style="font-size:11px;color:#aaa;">· Ebene '+layer+' ('+lN[layer]+')</span><br>'+
+    '<span style="color:#555;">'+desc+'</span>'+
+    (inactive?'':'<br><em style="font-size:11px;color:#aaa;">Wird hier erzeugt – referenzierbar von höheren Ebenen.</em>');
+  for(var i=1;i<=5;i++){var e=document.getElementById('L'+i);if(e)e.style.opacity=(i==layer)?'1':'0.18';}
+}
+function resetAll(){
+  sm=false;ss=0;
+  document.getElementById('nav-controls').style.display='none';
+  document.getElementById('btn-story').classList.remove('active');
+  ov.forEach(hi);
+  for(var i=1;i<=5;i++){var e=document.getElementById('L'+i);if(e)e.style.opacity='1';}
+  document.getElementById('det').innerHTML='<em style="color:#aaa;">Klicke auf eine Ebene oder einen Cluster – oder starte den Story-Modus.</em>';
+}
+</script>
+</body>
+</html>
