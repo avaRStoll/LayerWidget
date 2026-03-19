@@ -80,16 +80,16 @@
     <circle cx="762" cy="404" r="1.8" fill="#ccc"/><circle cx="778" cy="407" r="1.8" fill="#ccc"/><circle cx="794" cy="406" r="1.8" fill="#ccc"/>
   </g>
   <g class="cluster-g" onclick="selectCluster(event,5,'Klinische Bewertung','Biokompatibilität, Materialverträglichkeit (ISO 10993)')">
-    <ellipse cx="888" cy="415" rx="46" ry="14" fill="#AEAEAA" stroke="#666" stroke-width="0.7"/>
+    <ellipse cx="888" cy="415" rx="46" ry="14" ill="#E4E4E0" stroke="#bbb" stroke-width="0.6" stroke-dasharray="3 2"/>
     <text x="888" y="412" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#222" text-anchor="middle">Klin. Bewertung</text>
-    <circle cx="873" cy="417" r="2.5" fill="#555"/><circle cx="887" cy="420" r="2" fill="#555"/><circle cx="901" cy="419" r="2.5" fill="#555"/>
+    <circle cx="873" cy="417" r="2.5" fill="#ccc"/><circle cx="887" cy="420" r="2" fill="#ccc"/><circle cx="901" cy="419" r="2.5" fill="#ccc"/>
   </g>
 </g>
 
 <!-- EBENE 4 – KOMPONENTE (blau) cy=327 -->
 <g id="L4" class="layer-g" onclick="selectLayer(4)">
   <polygon points="30,327 480,302 930,327 480,352" fill="#C8DFF4" stroke="#2266AA" stroke-width="0.8"/>
-  <text x="60" y="318" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#0a3060">4 · Komponente</text>
+  <text x="60" y="309" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#0a3060">4 · Komponente</text>
   <g class="cluster-g" id="c4-anf" onclick="selectCluster(event,4,'Anforderungen','Funktionale Anforderungen, Schnittstellenanforderungen, SW-Anforderungen')">
     <ellipse cx="160" cy="327" rx="52" ry="14" fill="#88BBDD" stroke="#2266AA" stroke-width="0.7"/>
     <text x="160" y="324" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#0a2040" text-anchor="middle">Anforderungen</text>
@@ -212,7 +212,7 @@
 <!-- EBENE 1 – KLINISCHER WORKFLOW (rot) cy=63 -->
 <g id="L1" class="layer-g" onclick="selectLayer(1)">
   <polygon points="30,63 480,38 930,63 480,88" fill="#F4A090" stroke="#CC2200" stroke-width="0.8"/>
-  <text x="60" y="54" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#7a1100">1 · Klinischer Workflow</text>
+  <text x="60" y="45" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#7a1100">1 · Klinischer Workflow</text>
   <g class="cluster-g" onclick="selectCluster(event,1,'Anforderungen','Klinische Anforderungen, Intended Use, Indikationen')">
     <ellipse cx="160" cy="63" rx="52" ry="14" fill="#E07060" stroke="#CC2200" stroke-width="0.7"/>
     <text x="160" y="60" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#3a0800" text-anchor="middle">Anforderungen</text>
@@ -251,12 +251,12 @@
 </g>
 
 <!-- STORY OVERLAY -->
-<ellipse id="story-origin" cx="655" cy="393" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2.5" opacity="0" stroke-dasharray="6 3"/>
+<ellipse id="story-origin" cx="290" cy="402" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2.5" opacity="0" stroke-dasharray="6 3"/>
 <ellipse id="hl-L4" cx="655" cy="305" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
 <ellipse id="hl-L3" cx="655" cy="217" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
 <ellipse id="hl-L2" cx="655" cy="129" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
 <ellipse id="hl-L1" cx="655" cy="41" rx="58" ry="16" fill="none" stroke="#FF6600" stroke-width="2" opacity="0"/>
-<line id="line-54" x1="655" y1="377" x2="655" y2="321" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
+<line id="line-54" x1="290" y1="382" x2="655" y2="321" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
 <line id="line-43" x1="655" y1="289" x2="655" y2="233" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
 <line id="line-32" x1="655" y1="201" x2="655" y2="145" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
 <line id="line-21" x1="655" y1="113" x2="655" y2="57" stroke="#FF6600" stroke-width="2" stroke-dasharray="5 3" opacity="0" marker-end="url(#arru)"/>
@@ -281,7 +281,7 @@ var sm=false,ss=0,tot=6;
 var ov=['story-origin','hl-L4','hl-L3','hl-L2','hl-L1','line-54','line-43','line-32','line-21','badge-L4','badge-L3','badge-L2','badge-L1'];
 var steps=[
   {t:'Schritt 1: Information entsteht auf Ebene 5 – Bauteil',
-   d:'Im Risk-Management-Cluster der Bauteilebene entsteht eine konkrete Information: <strong>"Bildverarbeitungschip – Ausfallrate 0.003%"</strong>. Sie existiert genau hier – nicht kopiert, sondern referenzierbar.',
+   d:'Im Spezifikations-Cluster der Bauteilebene entsteht eine konkrete Information: <strong>"Bildverarbeitungschip – Ausfallrate 0.003%"</strong>. Sie existiert genau hier – nicht kopiert, sondern referenzierbar.',
    s:['story-origin'],l:{1:0.15,2:0.15,3:0.15,4:0.15,5:1}},
   {t:'Schritt 2: Ebene 4 (Komponente) referenziert und erweitert',
    d:'Die Ausfallrate wird im Komponenten-RM referenziert. Daraus entsteht eine <strong>neue</strong> Information: FMEA-Zeile "Bildverarbeitungsfehler → mögliche Fehlnavigation". Nicht kopiert – aufgebaut.',
